@@ -1,7 +1,8 @@
 use axum::{
     routing::{get, post},
-    Router,
+    Router, response::IntoResponse, Json,
 };
+use serde::Serialize;
 
 #[tokio::main]
 async fn main() {
@@ -20,6 +21,19 @@ async fn handle_hello() -> &'static str {
     return "Hello, World!";
 }
 
-async fn handle_post() -> &'static str {
-    return "Bad post";
+async fn handle_post() -> impl IntoResponse {
+    /*
+        ContentType: Application/Json
+        {"id": "28isi123k"}
+    */
+    let data = CreatedResponse {
+        id: "28isi123k".to_string()
+    };
+    Json(data)
+
+}
+
+#[derive(Serialize)]
+struct CreatedResponse {
+    id: String
 }
