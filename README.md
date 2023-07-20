@@ -2,5 +2,8 @@
 
 ## Contributors
 
+- Donna
+- Luc
+- Atte
 - Lidia
 - Marcus
