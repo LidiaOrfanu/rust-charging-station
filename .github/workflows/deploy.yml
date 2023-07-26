@@ -25,7 +25,7 @@ jobs:
         run: cargo build --release
 
       - name: Docker Build
-        run: docker build -t ${{ secrets.GCP_PROJECT_ID }}/app:${{ github.sha }} .
+        run: docker build -t app:${{ github.sha }} .
 
       ##- name: Docker Push
       ##  run: docker push ${{ secrets.GCP_PROJECT_ID }}/app:${{ github.sha }}
