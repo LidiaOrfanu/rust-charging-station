@@ -28,4 +28,5 @@ jobs:
         run: docker build -t app:${{ github.sha }} .
 
       ##- name: Docker Push
+      ##
       ##  run: docker push ${{ secrets.GCP_PROJECT_ID }}/app:${{ github.sha }}
