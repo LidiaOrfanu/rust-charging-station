@@ -1,7 +1,7 @@
 -- Add migration script here
-CREATE TABLE penguins (
+CREATE TABLE stations (
     id  SERIAL PRIMARY KEY,
     name varchar(255) NOT NULL,
-    species varchar(255) NOT NULL,
-    age  INTEGER
+    location varchar(255) NOT NULL,
+    availability BOOLEAN
 );

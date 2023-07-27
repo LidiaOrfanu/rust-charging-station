@@ -8,11 +8,11 @@ use std::fs;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize, sqlx::FromRow)]
-pub struct Penguin {
-    pub id: i64,
+pub struct ChargingStation {
+    pub id: i32,
     pub name: String,
-    pub species: String,
-    pub age: i64
+    pub location: String,
+    pub availability: bool
 }
 
 #[tokio::main]
@@ -25,9 +25,9 @@ async fn main()  {
     .connect(&database_url)
     .await.expect("Unable to connect to Postgres");
 
-    let select_query = query_as::<_, Penguin>("SELECT id, name, species, age FROM penguins");
-	let penguins: Vec<Penguin> = select_query.fetch_all(&pool).await.unwrap();
-	println!("\n=== select penguins with query.map...: \n{:?}", penguins);
+    let select_query = query_as::<_, ChargingStation>("SELECT id, name, location, availability FROM stations");
+	let stations: Vec<ChargingStation> = select_query.fetch_all(&pool).await.unwrap();
+	println!("\n=== select stations with query.map...: \n{:?}", stations);
 
     let app = Router::new()
     .route("/hello", get(handle_hello))
