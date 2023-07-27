@@ -3,9 +3,7 @@ use axum::{
     Router, response::IntoResponse, Json,
 };
 use sqlx::{postgres::PgPoolOptions, query_as};
-// use sqlx::postgres::PgPool;
 use std::fs;
-// use anyhow;
 
 use serde::{Deserialize, Serialize};
 
@@ -27,7 +25,7 @@ async fn main()  {
     .connect(&database_url)
     .await.expect("Unable to connect to Postgres");
 
-    let select_query = sqlx::query_as::<_, Penguin>("SELECT id, name, species, age FROM penguins");
+    let select_query = query_as::<_, Penguin>("SELECT id, name, species, age FROM penguins");
 	let penguins: Vec<Penguin> = select_query.fetch_all(&pool).await.unwrap();
 	println!("\n=== select penguins with query.map...: \n{:?}", penguins);
 
