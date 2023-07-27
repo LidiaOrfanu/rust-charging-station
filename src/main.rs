@@ -2,11 +2,35 @@ use axum::{
     routing::{get, post},
     Router, response::IntoResponse, Json,
 };
-use serde::Serialize;
+use sqlx::{postgres::PgPoolOptions, query_as};
+// use sqlx::postgres::PgPool;
+use std::fs;
+// use anyhow;
+
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Deserialize, Serialize, sqlx::FromRow)]
+pub struct Penguin {
+    pub id: i64,
+    pub name: String,
+    pub species: String,
+    pub age: i64
+}
 
 #[tokio::main]
-async fn main() {
-    // let app = Router::new().route("/hello", get(|| async { "Hello, World!" }));
+async fn main()  {
+    let env = fs::read_to_string(".env").unwrap();
+    let (key, database_url) = env.split_once('=').unwrap();
+    assert_eq!(key, "DATABASE_URL");
+    let pool = PgPoolOptions::new()
+    .max_connections(100)
+    .connect(&database_url)
+    .await.expect("Unable to connect to Postgres");
+
+    let select_query = sqlx::query_as::<_, Penguin>("SELECT id, name, species, age FROM penguins");
+	let penguins: Vec<Penguin> = select_query.fetch_all(&pool).await.unwrap();
+	println!("\n=== select penguins with query.map...: \n{:?}", penguins);
+
     let app = Router::new()
     .route("/hello", get(handle_hello))
     .route("/post", post(handle_post));

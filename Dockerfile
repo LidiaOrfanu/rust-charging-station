@@ -1,4 +1,8 @@
-FROM rust
-COPY /target/release/app /usr/local/bin
-EXPOSE 8080
-CMD [ "app" ]
+FROM rust:1.67
+
+WORKDIR /usr/src/app
+COPY . .
+
+RUN cargo install --path .
+
+CMD ["app"]
