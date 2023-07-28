@@ -1,19 +1,14 @@
 use axum::{
     routing::{get, post},
-    Router, response::IntoResponse, Json,
+    Router,
 };
 use sqlx::{postgres::PgPoolOptions, query_as};
 use std::fs;
 
-use serde::{Deserialize, Serialize};
+use crate::{models::charging_station::ChargingStation, controllers::charging_station::{handle_hello, handle_post}};
 
-#[derive(Debug, Deserialize, Serialize, sqlx::FromRow)]
-pub struct ChargingStation {
-    pub id: i32,
-    pub name: String,
-    pub location: String,
-    pub availability: bool
-}
+mod models;
+mod controllers;
 
 #[tokio::main]
 async fn main()  {
@@ -39,23 +34,5 @@ async fn main()  {
         .unwrap();
 }
 
-async fn handle_hello() -> &'static str {
-    return "Hello, World!";
-}
 
-async fn handle_post() -> impl IntoResponse {
-    /*
-        ContentType: Application/Json
-        {"id": "28isi123k"}
-    */
-    let data = CreatedResponse {
-        id: "28isi123k".to_string()
-    };
-    Json(data)
 
-}
-
-#[derive(Serialize)]
-struct CreatedResponse {
-    id: String
-}
