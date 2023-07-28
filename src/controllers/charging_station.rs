@@ -1,6 +1,9 @@
-use axum::{response::IntoResponse, Json};
+use std::sync::Arc;
 
-use crate::models::charging_station::CreatedResponse;
+use axum::{response::IntoResponse, Json, http::StatusCode, extract::State};
+use sqlx::query_as;
+
+use crate::{models::charging_station::{CreatedResponse, ChargingStation}, AppState};
 
 pub async fn handle_hello() -> &'static str {
     return "Hello, World!";
@@ -15,5 +18,13 @@ pub async fn handle_post() -> impl IntoResponse {
         id: "28isi123k".to_string()
     };
     Json(data)
+
+}
+
+pub async fn handle_get_all_stations(State(data): State<Arc<AppState>>) -> impl IntoResponse {
+    let select_query = query_as::<_, ChargingStation>("SELECT id, name, location, availability FROM stations");
+	let stations: Vec<ChargingStation> = select_query.fetch_all(&data.db).await.unwrap();
+	println!("\n=== select stations with query.map...: \n{:?}", stations);
+    ((StatusCode::OK), Json(stations))
 
 }
