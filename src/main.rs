@@ -1,14 +1,12 @@
-use axum::{
-    routing::{get, post},
-    Router,
-};
+use axum::Router;
 use sqlx::{postgres::PgPoolOptions, query_as};
 use std::fs;
 
-use crate::{models::charging_station::ChargingStation, controllers::charging_station::{handle_hello, handle_post}};
-
+use crate::models::charging_station::ChargingStation;
+use crate::routes::route_all::routes;
 mod models;
 mod controllers;
+mod routes;
 
 #[tokio::main]
 async fn main()  {
@@ -24,9 +22,7 @@ async fn main()  {
 	let stations: Vec<ChargingStation> = select_query.fetch_all(&pool).await.unwrap();
 	println!("\n=== select stations with query.map...: \n{:?}", stations);
 
-    let app = Router::new()
-    .route("/hello", get(handle_hello))
-    .route("/post", post(handle_post));
+    let app = Router::new().merge(routes());
 
     axum::Server::bind(&"0.0.0.0:8080".parse().unwrap())
         .serve(app.into_make_service())
