@@ -27,13 +27,6 @@ jobs:
       - name: Docker Build
         run: docker build -t app:${{ github.sha }} .
 
-      - name: Flyctl Setup
-        run: |
-          curl -L https://fly.io/install.sh | sh
-          flyctl auth login --access-token ${{ secrets.FLY_ACCESS_TOKEN }}
-
-      - name: Deploy to Fly.io
-        run: |
-          docker tag app:${{ github.sha }} registry.fly.io/rust-charging-station:${{ github.sha }}
-          docker push registry.fly.io/rust-charging-station:${{ github.sha }}
-          flyctl deploy -i registry.fly.io/rust-charging-station:${{ github.sha }} -e DATABASE_URL=${{ secrets.DATABASE_URL }}
+      ##- name: Docker Push
+      ##
+      ##  run: docker push ${{ secrets.GCP_PROJECT_ID }}/app:${{ github.sha }}
