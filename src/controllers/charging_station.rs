@@ -1,5 +1,4 @@
 use std::sync::Arc;
-
 use axum::{response::IntoResponse, Json, http::StatusCode, extract::State};
 use sqlx::query_as;
 
