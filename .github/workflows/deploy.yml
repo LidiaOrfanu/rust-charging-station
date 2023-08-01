@@ -5,9 +5,12 @@ on:
     branches:
       - "main"
 
+env: 
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
 jobs:
   deploy:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
@@ -21,12 +24,22 @@ jobs:
       - name: Setup Rust Cache
         uses: Swatinem/rust-cache@v1
 
+      - name: Cache Sqlx
+        id: cache-sqlx
+        uses: actions/cache@v2
+        with:
+          path: ~/.cargo/bin
+          key: ${{ runner.os }}-sqlx-${{ hashFiles('**/install-sqlx.sh')}}
+
+      - name: Install sqlx cli
+        if: steps.cache-sqlx.outputs.cache-hit != 'true'
+        run: ./scripts/install-sqlx.sh
+
       - name: Cargo Build
         run: cargo build --release
 
       - name: Docker Build
         run: docker build -t app:${{ github.sha }} .
 
-      ##- name: Docker Push
-      ##
-      ##  run: docker push ${{ secrets.GCP_PROJECT_ID }}/app:${{ github.sha }}
+      - name: Docker Push
+        run: docker push app:${{ github.sha }}

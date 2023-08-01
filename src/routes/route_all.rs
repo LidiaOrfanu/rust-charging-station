@@ -8,6 +8,6 @@ pub fn routes(app_state: Arc<AppState>) -> Router {
     Router::new()
         .route("/hello", get(handle_hello))
         .route("/post", post(handle_post))
-        .route("/stations", get(handle_get_all_stations))
+        .route("/api/stations", get(handle_get_all_stations))
         .with_state(app_state)
 }
