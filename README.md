@@ -14,6 +14,11 @@ ChargingStation:
     - location: String,
     - availability: bool
 
+## Endpoints
+
+<http://localhost:8080/api/stations> : to get all the stations
+WIP: <https://rust-charging-station.fly.dev/api/stations>
+
 ## Contributors
 
 - Donna
