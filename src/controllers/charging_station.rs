@@ -21,8 +21,8 @@ pub async fn handle_post() -> impl IntoResponse {
 }
 
 pub async fn handle_get_all_stations(State(data): State<Arc<AppState>>) -> impl IntoResponse {
-    let select_query = query_as::<_, ChargingStation>("SELECT id, name, location, availability FROM stations");
-	let stations: Vec<ChargingStation> = select_query.fetch_all(&data.db).await.unwrap();
+    const QUERY: &str = "SELECT id, name, location, availability FROM stations";
+	let stations: Vec<ChargingStation> = query_as(QUERY).fetch_all(&data.db).await.unwrap();
 	println!("\n=== select stations with query.map...: \n{:?}", stations);
     ((StatusCode::OK), Json(stations))
 
