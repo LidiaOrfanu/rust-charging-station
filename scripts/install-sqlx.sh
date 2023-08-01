@@ -1,1 +1,1 @@
-cargo install sqlx-cli --locked --version=0.7 --no-default-features --features postgres,macros, runtime-tokio-rustls, any
+cargo install sqlx-cli --locked --version=0.7 --no-default-features --features postgres
