@@ -1,4 +1,9 @@
-use axum::{extract::State, http::StatusCode, response::IntoResponse, Json};
+use axum::{
+    extract::{Path, State},
+    http::StatusCode,
+    response::IntoResponse,
+    Json,
+};
 use serde_json::{json, Value};
 use sqlx::query_as;
 use std::sync::Arc;
@@ -57,7 +62,7 @@ pub async fn handle_post_a_station(
                     }
                 }
             });
-        return Ok((StatusCode::CREATED, Json(station_response)));
+            return Ok((StatusCode::CREATED, Json(station_response)));
         }
         Err(e) => {
             if e.to_string()
@@ -73,6 +78,43 @@ pub async fn handle_post_a_station(
                 StatusCode::INTERNAL_SERVER_ERROR,
                 Json(json!({"status": "error","message": format!("{:?}", e)})),
             ));
+        }
+    }
+}
+
+pub async fn handler_get_station_by_id(
+    Path(id): Path<i32>,
+    State(data): State<Arc<AppState>>,
+) -> Result<impl IntoResponse, (StatusCode, Json<Value>)> {
+    let query = format!(
+        "SELECT * FROM stations WHERE id = $1",
+    );
+    let query_result = query_as::<_, ChargingStation>(&query)
+    .bind(id)
+    .fetch_one(&data.db)
+    .await;
+    // let query_result = query_as!(ChargingStation, "SELECT * FROM stations WHERE id = $1", id)
+    //     .fetch_one(&data.db)
+    //     .await;
+
+    match query_result {
+        Ok(station) => {
+            let station_response = json!({
+                "status": "success",
+                "data": json!({
+                    "station": station
+                })
+            });
+
+            return Ok((StatusCode::FOUND, Json(station_response)));
+        }
+        Err(_) => {
+            let error_response = json!({
+                "status": "fail",
+                "message": format!("Station with ID: {} not found", id)
+            });
+
+            return Err((StatusCode::NOT_FOUND, Json(error_response)));
         }
     }
 }
