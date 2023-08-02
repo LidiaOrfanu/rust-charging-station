@@ -7,7 +7,7 @@ use axum::{
 
 use crate::{
     handlers::charging_station::{
-        handle_get_all_stations, handle_hello, handle_post, handle_post_a_station, handler_get_station_by_id,
+        handle_get_all_stations, handle_hello, handle_post, handle_post_a_station, handler_get_station_by_id, handler_edit_station_by_id,
     },
     AppState,
 };
@@ -18,6 +18,6 @@ pub fn routes(app_state: Arc<AppState>) -> Router {
         .route("/post", post(handle_post))
         .route("/api/stations", get(handle_get_all_stations))
         .route("/api/station", post(handle_post_a_station))
-        .route("/api/stations/:id", get(handler_get_station_by_id))
+        .route("/api/stations/:id", get(handler_get_station_by_id).patch(handler_edit_station_by_id))
         .with_state(app_state)
 }

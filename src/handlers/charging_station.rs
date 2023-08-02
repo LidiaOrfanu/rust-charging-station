@@ -9,7 +9,7 @@ use sqlx::query_as;
 use std::sync::Arc;
 
 use crate::{
-    models::charging_station::{ChargingStation, CreateChargingStation, CreatedResponse},
+    models::charging_station::{ChargingStation, CreateChargingStation, CreatedResponse, UpdateChargingStation},
     AppState,
 };
 
@@ -115,6 +115,65 @@ pub async fn handler_get_station_by_id(
             });
 
             return Err((StatusCode::NOT_FOUND, Json(error_response)));
+        }
+    }
+}
+
+pub async fn handler_edit_station_by_id(
+    Path(id): Path<i32>,
+    State(data): State<Arc<AppState>>,
+    Json(body): Json<UpdateChargingStation>
+) -> Result<impl IntoResponse, (StatusCode, Json<Value>)> {
+    let query = format!(
+        "SELECT * FROM stations WHERE id = $1",
+    );
+    let query_result = query_as::<_, ChargingStation>(&query)
+    .bind(id)
+    .fetch_one(&data.db)
+    .await;
+
+    if query_result.is_err() {
+        let error_response = json!({
+            "status": "fail",
+            "message": format!("Station with ID: {} not found", id)
+        });
+
+        return Err((StatusCode::NOT_FOUND, Json(error_response)));
+    }
+
+    let query = format!(
+        "UPDATE stations SET name = $1, location = $2, availability = $3 WHERE id = $4 RETURNING *",
+    );
+
+    let name = body.name.map_or_else(|| "".to_string(), |value| value.clone());
+    let location = body.location.map_or_else(|| "".to_string(), |value| value.clone());
+    let availability = body.availability.unwrap_or(false);
+
+    let query_result = query_as::<_, ChargingStation>(&query)
+    .bind(name)
+    .bind(location)
+    .bind(availability)
+    .bind(id)
+    .fetch_one(&data.db)
+    .await;
+
+    match query_result {
+        Ok(station) => {
+            let station_response = json!({
+                "status": "success",
+                "data": json!({
+                    "station": station
+                })
+            });
+            return Ok((StatusCode::OK, Json(station_response)));
+        }
+        Err(err) => {
+            let error_response = json!({
+                "status": "error",
+                "message": format!("{:?}", err)
+            });
+
+            return Err((StatusCode::INTERNAL_SERVER_ERROR, Json(error_response)));
         }
     }
 }
