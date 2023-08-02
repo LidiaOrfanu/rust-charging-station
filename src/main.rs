@@ -2,7 +2,7 @@ use sqlx::{postgres::PgPoolOptions, Pool, Postgres};
 use std::{fs, sync::Arc};
 
 use crate::routes::route_all::routes;
-mod controllers;
+mod handlers;
 mod models;
 mod routes;
 

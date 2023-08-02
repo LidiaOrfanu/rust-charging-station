@@ -6,7 +6,7 @@ use axum::{
 };
 
 use crate::{
-    controllers::charging_station::{
+    handlers::charging_station::{
         handle_get_all_stations, handle_hello, handle_post, handle_post_a_station, handler_get_station_by_id,
     },
     AppState,
