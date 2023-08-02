@@ -15,6 +15,13 @@ pub struct CreateChargingStation {
     pub availability: bool,
 }
 
+#[derive(Debug, Deserialize, Serialize, sqlx::FromRow)]
+pub struct UpdateChargingStation {
+    pub name: String,
+    pub location: String,
+    pub availability: bool,
+}
+
 #[derive(Serialize)]
 pub struct CreatedResponse {
     pub id: String,
