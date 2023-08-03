@@ -41,6 +41,23 @@ pub async fn handle_post_a_station(
     State(data): State<Arc<AppState>>,
     Json(body): Json<CreateChargingStation>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<Value>)> {
+        // Check if a station with the same name already exists in the database
+        let query_existing = format!("SELECT * FROM stations WHERE name = $1");
+        let existing_station = query_as::<_, ChargingStation>(&query_existing)
+            .bind(&body.name)
+            .fetch_optional(&data.db)
+            .await
+            .unwrap();
+    
+        if let Some(_) = existing_station {
+            // Station with the same name already exists
+            let error_response = json!({
+                "status": "fail",
+                "message": "Station with that name already exists",
+            });
+            return Err((StatusCode::CONFLICT, Json(error_response)));
+        }
+    
     let availability_value = if body.availability { "TRUE" } else { "FALSE" };
     let query = format!(
         "INSERT INTO stations (name, location, availability) VALUES ('{}', '{}', {}) RETURNING *",
