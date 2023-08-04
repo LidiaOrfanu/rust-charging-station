@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-
+use validator::Validate;
 #[derive(Debug, Deserialize, Serialize, sqlx::FromRow)]
 pub struct ChargingStation {
     pub id: i32,
@@ -8,9 +8,11 @@ pub struct ChargingStation {
     pub availability: bool,
 }
 
-#[derive(Debug, Deserialize, Serialize, sqlx::FromRow)]
+#[derive(Debug, Deserialize, Serialize, sqlx::FromRow, Validate)]
 pub struct CreateChargingStation {
+    #[validate(length(min = 3, max = 15))]
     pub name: String,
+    #[validate(length(min = 3, max = 15))]
     pub location: String,
     pub availability: bool,
 }
